@@ -4,51 +4,163 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mr. Bilai Pet Clinic - ERP</title>
-    <!-- Core Firebase SDK App and Database via Compatibility scripts -->
+    <!-- Tailwind CSS for UI Layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Complete Firebase Product Compatibility Scripts (Fixed Core) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-    
+
     <style>
         :root {
-            --paper: #f5f0e8; --paper2: #ece6d8; --paper3: #e0d8c4;
-            --card: #fdfaf3; --card2: #f8f3e8;
-            --ink: #1a1810; --ink2: #4a4535; --ink3: #8a8060; --ink4: #b8af95;
-            --forest: #1e3a1a; --forest2: #2d5428; --forest3: #3d7038;
-            --forest-l: #e8f0e4; --forest-m: #a8c898;
-            --rust: #7a2a18; --rust2: #a03820;
+            --forest: #1e3a1a;
+            --forest-light: #f4f8f3;
+            --rust: #7a2a18;
         }
-        /* [Tomar database layout er existing dynamic css animation blocks running internally] */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--paper);
-            color: var(--ink);
-            margin: 0;
-            padding: 20px;
-        }
-        .header {
-            background-color: var(--forest);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        /* Baki shob styling structure active thakbe... */
+        body { background-color: #f7f5f0; color: #1a1810; }
+        .tab-btn.active { background-color: var(--forest); color: white; }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8">
 
-    <div class="header">
-        <h1>Mr. Bilai Pet Clinic 🐾</h1>
-        <p>Stock & Sales Clinic ERP Dashboard</p>
+    <!-- Top Status Bar & App Header -->
+    <div class="max-w-7xl mx-auto mb-6 bg-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row justify-between items-center border-l-4 border-emerald-700">
+        <div class="flex items-center gap-3">
+            <div class="p-3 bg-emerald-100 rounded-full text-emerald-800 text-2xl">🐾</div>
+            <div>
+                <h1 class="text-2xl font-bold text-emerald-950">Mr. Bilai Pet Clinic</h1>
+                <p class="text-sm text-gray-500">Stock, Sales & Patient Registration ERP</p>
+            </div>
+        </div>
+        <div id="db-status" class="mt-3 md:mt-0 px-4 py-2 rounded-full text-sm font-semibold bg-amber-100 text-amber-800 flex items-center gap-2">
+            <span class="animate-pulse h-2 w-2 rounded-full bg-amber-500"></span> Connecting Core Cloud...
+        </div>
     </div>
 
-    <!-- [Pura dashboard elements input grids dynamically rendered below] -->
-    <div id="app-status" style="padding: 10px; margin-bottom: 15px; border-radius: 5px; background: #d4edda; color: #155724;">
-        Connecting to Clinic Core Cloud...
+    <!-- Main Navigation Tabs -->
+    <div class="max-w-7xl mx-auto mb-6 flex gap-2 border-b border-gray-200 pb-2">
+        <button onclick="switchTab('inventory')" id="tab-inventory" class="tab-btn active px-4 py-2 rounded-lg font-medium transition-all">
+            <i class="fa-solid fa-boxes-stacked mr-2"></i>Inventory
+        </button>
+        <button onclick="switchTab('sales')" id="tab-sales" class="tab-btn px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-100 transition-all">
+            <i class="fa-solid fa-cart-shopping mr-2"></i>Counter Sales
+        </button>
+        <button onclick="switchTab('patients')" id="tab-patients" class="tab-btn px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-100 transition-all">
+            <i class="fa-solid fa-user-injured mr-2"></i>Patient Visits
+        </button>
     </div>
 
+    <!-- Main App Container -->
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left Section: Forms Container -->
+        <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
+            
+            <!-- Tab 1: Inventory Form -->
+            <div id="form-inventory" class="tab-content">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-plus-circle text-emerald-700"></i> Add Stock Item</h3>
+                <form id="invForm" onsubmit="handleInventorySubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Item Name</label>
+                        <input type="text" id="inv-name" required placeholder="e.g. Amoxicillin 250mg" class="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Unit Buy Price</label>
+                            <input type="number" id="inv-buy" step="0.01" required placeholder="0.00" class="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Stock Qty</label>
+                            <input type="number" id="inv-qty" required placeholder="0" class="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-800 hover:bg-emerald-900 text-white p-3 rounded-lg font-medium transition-colors shadow-sm">Save Item</button>
+                </form>
+            </div>
+
+            <!-- Tab 2: Sales Form -->
+            <div id="form-sales" class="tab-content hidden">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-cash-register text-emerald-700"></i> New Sale Invoice</h3>
+                <form id="saleForm" onsubmit="handleSaleSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Customer / Pet Owner</label>
+                        <input type="text" id="sale-customer" required placeholder="Walk-in Customer" class="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Bill (Tk)</label>
+                            <input type="number" id="sale-total" required placeholder="0" class="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Payment Method</label>
+                            <select id="sale-method" class="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700">
+                                <option value="Cash">Cash</option>
+                                <option value="bKash">bKash</option>
+                                <option value="Nagad">Nagad</option>
+                                <option value="Card">Card</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-800 hover:bg-emerald-900 text-white p-3 rounded-lg font-medium transition-colors shadow-sm">Process Sale</button>
+                </form>
+            </div>
+
+            <!-- Tab 3: Patients Form -->
+            <div id="form-patients" class="tab-content hidden">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-file-medical text-emerald-700"></i> Patient Registration</h3>
+                <form id="patientForm" onsubmit="handlePatientSubmit(event)" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Pet Name</label>
+                            <input type="text" id="p-name" required placeholder="e.g. Tom" class="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Pet Type/Species</label>
+                            <input type="text" id="p-type" required placeholder="e.g. Cat / Persian" class="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Symptoms / Issue</label>
+                        <textarea id="p-symptoms" required rows="2" placeholder="e.g. Fever, not eating since yesterday" class="w-full p-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-800 hover:bg-emerald-900 text-white p-3 rounded-lg font-medium transition-colors shadow-sm">Check-in Patient</button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- Right Section: Live Tables Display -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="table-title" class="text-lg font-bold text-gray-800">Live Inventory Items</h3>
+                    <div class="text-xs text-gray-400 font-mono">Real-time sync active</div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider border-b border-gray-100" id="table-headers">
+                                <th class="p-3">Item Name</th>
+                                <th class="p-3">Buy Price</th>
+                                <th class="p-3">Qty Available</th>
+                                <th class="p-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-rows" class="divide-y divide-gray-50 text-gray-700">
+                            <tr><td colspan="4" class="p-4 text-center text-gray-400">Loading data engine...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase Script Configuration Block -->
     <script>
-        // Real-time Credentials Injected with Compatibility Layer
+        // Real credentials
         const firebaseConfig = {
             apiKey: "AIzaSyAEsmdGyKJv4Lx4F2aUKCGSMZ2MaBgVoQY",
             authDomain: "mr-bilai-pet-clinic.firebaseapp.com",
@@ -58,14 +170,136 @@
             appId: "1:761164198761:web:cfa8202c4448bfb18b83f8"
         };
 
-        // Initialize Firebase
+        // Initialize App & DB
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const db = firebase.database();
 
-        // Update status UI
-        document.getElementById('app-status').innerText = "Database Connected Successfully! (Live)";
-        
-        // [Baki shob Form Submit Event and Realtime Data Listeners processing continuous run here]
+        // Check Connection
+        db.ref(".info/connected").on("value", function(snap) {
+            const statusBox = document.getElementById("db-status");
+            if (snap.val() === true) {
+                statusBox.className = "mt-3 md:mt-0 px-4 py-2 rounded-full text-sm font-semibold bg-emerald-100 text-emerald-800 flex items-center gap-2";
+                statusBox.innerHTML = '<span class="h-2 w-2 rounded-full bg-emerald-500"></span> Cloud Live Connected';
+            } else {
+                statusBox.className = "mt-3 md:mt-0 px-4 py-2 rounded-full text-sm font-semibold bg-amber-100 text-amber-800 flex items-center gap-2";
+                statusBox.innerHTML = '<span class="animate-pulse h-2 w-2 rounded-full bg-amber-500"></span> Reconnecting...';
+            }
+        });
+
+        let currentActiveTab = 'inventory';
+
+        function switchTab(tabName) {
+            currentActiveTab = tabName;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'bg-emerald-800', 'text-white'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            
+            const btn = document.getElementById('tab-' + tabName);
+            btn.classList.add('active');
+            document.getElementById('form-' + tabName).classList.remove('hidden');
+            
+            renderTableData();
+        }
+
+        // Submissions to Database
+        function handleInventorySubmit(e) {
+            e.preventDefault();
+            db.ref('inventory').push({
+                name: document.getElementById('inv-name').value,
+                buyPrice: parseFloat(document.getElementById('inv-buy').value),
+                qty: parseInt(document.getElementById('inv-qty').value),
+                timestamp: Date.now()
+            });
+            document.getElementById('invForm').reset();
+        }
+
+        function handleSaleSubmit(e) {
+            e.preventDefault();
+            db.ref('sales').push({
+                customer: document.getElementById('sale-customer').value,
+                total: parseFloat(document.getElementById('sale-total').value),
+                method: document.getElementById('sale-method').value,
+                timestamp: Date.now()
+            });
+            document.getElementById('saleForm').reset();
+        }
+
+        function handlePatientSubmit(e) {
+            e.preventDefault();
+            db.ref('patients').push({
+                name: document.getElementById('p-name').value,
+                type: document.getElementById('p-type').value,
+                symptoms: document.getElementById('p-symptoms').value,
+                timestamp: Date.now()
+            });
+            document.getElementById('patientForm').reset();
+        }
+
+        // Deletion helper
+        function deleteRecord(id) {
+            if(confirm("Are you sure you want to delete this record?")) {
+                db.ref(currentActiveTab + '/' + id).remove();
+            }
+        }
+
+        // Realtime Table Render Engine
+        function renderTableData() {
+            const title = document.getElementById('table-title');
+            const headers = document.getElementById('table-headers');
+            const tbody = document.getElementById('data-rows');
+            
+            tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">Fetching real-time updates...</td></tr>';
+            
+            db.ref(currentActiveTab).on('value', snapshot => {
+                tbody.innerHTML = '';
+                const data = snapshot.val();
+                
+                if(!data) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">No records found. Data empty.</td></tr>';
+                    return;
+                }
+
+                if(currentActiveTab === 'inventory') {
+                    title.innerText = "Live Inventory Items";
+                    headers.innerHTML = '<th class="p-3">Item Name</th><th class="p-3">Buy Price</th><th class="p-3">Qty Available</th><th class="p-3">Actions</th>';
+                    Object.keys(data).forEach(key => {
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-3 font-medium">${data[key].name}</td>
+                                <td class="p-3">Tk ${data[key].buyPrice}</td>
+                                <td class="p-3"><span class="px-2 py-1 rounded text-xs ${data[key].qty > 5 ? 'bg-green-100 text-green-800':'bg-red-100 text-red-800'}">${data[key].qty} Pcs</span></td>
+                                <td class="p-3"><button onclick="deleteRecord('${key}')" class="text-red-600 hover:text-red-900"><i class="fa-solid fa-trash"></i></button></td>
+                            </tr>`;
+                    });
+                } else if(currentActiveTab === 'sales') {
+                    title.innerText = "Live Store Invoices";
+                    headers.innerHTML = '<th class="p-3">Customer</th><th class="p-3">Total Paid</th><th class="p-3">Method</th><th class="p-3">Actions</th>';
+                    Object.keys(data).forEach(key => {
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-3 font-medium">${data[key].customer}</td>
+                                <td class="p-3 font-bold text-emerald-800">Tk ${data[key].total}</td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">${data[key].method}</span></td>
+                                <td class="p-3"><button onclick="deleteRecord('${key}')" class="text-red-600 hover:text-red-900"><i class="fa-solid fa-trash"></i></button></td>
+                            </tr>`;
+                    });
+                } else if(currentActiveTab === 'patients') {
+                    title.innerText = "Live Active Patient Registry";
+                    headers.innerHTML = '<th class="p-3">Pet Details</th><th class="p-3">Symptoms/Issue</th><th class="p-3">Status</th><th class="p-3">Actions</th>';
+                    Object.keys(data).forEach(key => {
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-3"><strong>${data[key].name}</strong> <span class="text-xs text-gray-400">(${data[key].type})</span></td>
+                                <td class="p-3 text-xs max-w-xs truncate">${data[key].symptoms}</td>
+                                <td class="p-3"><span class="px-2 py-0.5 bg-purple-100 text-purple-800 rounded text-xs">In Consultation</span></td>
+                                <td class="p-3"><button onclick="deleteRecord('${key}')" class="text-red-600 hover:text-red-900"><i class="fa-solid fa-trash"></i></button></td>
+                            </tr>`;
+                    });
+                }
+            });
+        }
+
+        // Run Engine on load
+        renderTableData();
     </script>
 </body>
 </html>
