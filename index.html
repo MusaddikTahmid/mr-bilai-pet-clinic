@@ -1,213 +1,1393 @@
+cat > /mnt/user-data/outputs/mr-bilai-clinic-v9.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mr. Bilai Pet Clinic - ERP</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Firebase App & Database Compat (Bulletproof CDN) -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Mr. Bilai Pet Clinic — ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Firebase v10 compat SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+:root{
+  --paper:#f5f0e8;--paper2:#ece6d8;--paper3:#e0d8c4;
+  --card:#fdfaf3;--card2:#f8f3e8;
+  --ink:#1a1810;--ink2:#4a4535;--ink3:#8a8060;--ink4:#b8aa90;
+  --forest:#1e3a1a;--forest2:#2d5428;--forest3:#3d7038;
+  --forest-l:#e8f0e4;--forest-m:#a8c898;
+  --rust:#7a2a18;--rust2:#a03820;
+  --rust-l:#f5ebe8;--rust-m:#d4a090;
+  --gold:#8a6020;--gold2:#b07828;
+  --gold-l:#faf0d8;--gold-m:#d4b870;
+  --sky:#1a3c6a;--sky2:#1e5298;
+  --sky-l:#e4ecf8;--sky-m:#90b4d8;
+  --border:#d0c8b0;--border2:#b8ae98;
+  --shadow:0 1px 3px rgba(26,24,16,.07),0 4px 16px rgba(26,24,16,.05);
+  --shadow-md:0 3px 8px rgba(26,24,16,.09),0 8px 28px rgba(26,24,16,.07);
+  --shadow-lg:0 8px 24px rgba(26,24,16,.12),0 20px 56px rgba(26,24,16,.09);
+}
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Lexend',sans-serif;background:var(--paper);color:var(--ink);font-size:14px;line-height:1.6}
+.serif{font-family:'Lora',serif}
+.serif-i{font-family:'Lora',serif;font-style:italic}
+
+/* ── GLOBAL HEADER ── */
+.g-header{
+  background:linear-gradient(135deg,var(--forest) 0%,var(--forest2) 60%,var(--forest3) 100%);
+  color:#fff;
+  box-shadow:0 2px 20px rgba(30,58,26,.4);
+  position:sticky;top:0;z-index:50;
+}
+.g-header-inner{max-width:1600px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;min-height:60px}
+.brand-text{font-family:'Lora',serif;font-style:italic;font-size:1.2rem;font-weight:700;letter-spacing:.01em}
+.brand-sub{font-size:10px;opacity:.6;letter-spacing:.1em;text-transform:uppercase;margin-top:1px}
+
+.g-stats{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.g-stat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:6px 14px;display:flex;flex-direction:column;align-items:center;min-width:110px}
+.g-stat-val{font-family:'Lora',serif;font-size:1.1rem;font-weight:700;line-height:1}
+.g-stat-lbl{font-size:9.5px;opacity:.65;text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+
+.mx-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Lexend',sans-serif;transition:all .18s;white-space:nowrap;letter-spacing:.01em}
+.mx-excel{background:linear-gradient(135deg,#217346,#185a34);color:#fff;box-shadow:0 2px 10px rgba(33,115,70,.45)}
+.mx-excel:hover{box-shadow:0 4px 16px rgba(33,115,70,.6);transform:translateY(-1px)}
+.mx-pdf{background:linear-gradient(135deg,#b22222,#8b1a1a);color:#fff;box-shadow:0 2px 10px rgba(178,34,34,.4)}
+.mx-pdf:hover{box-shadow:0 4px 16px rgba(178,34,34,.55);transform:translateY(-1px)}
+
+.app-wrap{max-width:1600px;margin:0 auto;padding:16px 18px 60px}
+
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--border);padding-bottom:0}
+.tab-btn{padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--ink3);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;font-family:'Lexend',sans-serif;white-space:nowrap;border-radius:6px 6px 0 0}
+.tab-btn:hover{color:var(--ink);background:var(--paper2)}
+.tab-btn.active{color:var(--forest);border-bottom-color:var(--forest);background:var(--card)}
+.tab-pane{display:none;animation:fadeUp .25s ease}
+.tab-pane.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.module-grid{display:grid;grid-template-columns:380px 1fr;gap:16px;align-items:start}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.card-head{padding:13px 17px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:var(--card2)}
+.card-head h3{font-family:'Lora',serif;font-style:italic;font-size:.98rem;color:var(--forest)}
+.card-body{padding:16px 17px}
+
+.f-row{margin-bottom:12px}
+.f-label{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink2);margin-bottom:5px}
+.f-label .tag{font-size:9px;text-transform:none;letter-spacing:0;background:var(--forest-l);color:var(--forest);border-radius:4px;padding:1px 6px;margin-left:5px;font-weight:700}
+.f-in{width:100%;background:var(--paper2);border:1.5px solid var(--border);border-radius:8px;padding:8px 11px;font-family:'Lexend',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
+.f-in:focus{border-color:var(--forest);background:var(--card);box-shadow:0 0 0 3px rgba(30,58,26,.1)}
+.f-in::placeholder{color:var(--ink4)}
+.f-in option{background:var(--card);color:var(--ink)}
+select.f-in{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%234a4535' viewBox='0 0 20 20'%3E%3Cpath d='M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;background-size:15px;padding-right:32px}
+.f-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f-err{font-size:11.5px;color:var(--rust);background:var(--rust-l);border:1px solid var(--rust-m);border-radius:7px;padding:8px 11px;display:none;margin-top:8px}
+.f-success{font-size:11.5px;color:var(--forest);background:var(--forest-l);border:1px solid var(--forest-m);border-radius:7px;padding:8px 11px;display:none;margin-top:8px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:1px solid transparent;font-family:'Lexend',sans-serif;transition:all .15s;white-space:nowrap}
+.btn svg{width:13px;height:13px;flex-shrink:0}
+.btn-primary{background:var(--forest);color:#fff;box-shadow:0 2px 8px rgba(30,58,26,.3)}
+.btn-primary:hover{background:var(--forest2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(30,58,26,.4)}
+.btn-cancel{background:var(--paper2);border-color:var(--border);color:var(--ink2)}
+.btn-cancel:hover{border-color:var(--border2);color:var(--ink)}
+.btn-rust{background:var(--rust-l);border-color:var(--rust-m);color:var(--rust)}
+.btn-rust:hover{background:var(--rust-m)}
+.btn-gold{background:var(--gold-l);border-color:var(--gold-m);color:var(--gold)}
+.btn-gold:hover{background:var(--gold-m)}
+.btn-sky{background:var(--sky-l);border-color:var(--sky-m);color:var(--sky)}
+.btn-sky:hover{background:var(--sky-m)}
+.btn-forest{background:var(--forest-l);border-color:var(--forest-m);color:var(--forest)}
+.btn-forest:hover{background:var(--forest-m)}
+.btn-sm{padding:5px 10px;font-size:11.5px;border-radius:6px}
+.btn-xs{padding:3px 8px;font-size:11px;border-radius:5px}
+.editing-mode{background:var(--gold-l)!important;border:2px solid var(--gold-m)!important}
+
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{padding:9px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);border-bottom:1.5px solid var(--border);background:var(--paper2)}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tbody tr:last-child td{border-bottom:none}
+.tbl tbody tr{transition:background .1s}
+.tbl tbody tr:hover td{background:var(--paper2)}
+.tbl tbody tr.row-low td{background:rgba(122,42,24,.04)}
+.tbl tbody tr.row-low:hover td{background:rgba(122,42,24,.08)}
+.tbl tfoot td{background:var(--paper2);font-weight:700;border-top:2px solid var(--border2);font-size:12px}
+
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;border:1px solid}
+.b-med{background:#e8f0fd;color:#1d4ed8;border-color:#bfdbfe}
+.b-acc{background:#f3e8ff;color:#6d28d9;border-color:#ddd6fe}
+.b-ok{background:var(--forest-l);color:var(--forest);border-color:var(--forest-m)}
+.b-low{background:var(--rust-l);color:var(--rust);border-color:var(--rust-m)}
+.b-profit{background:var(--forest-l);color:var(--forest2);border-color:var(--forest-m);font-weight:800}
+.b-loss{background:var(--rust-l);color:var(--rust2);border-color:var(--rust-m)}
+.b-visit{background:var(--sky-l);color:var(--sky);border-color:var(--sky-m)}
+
+.med-row{background:var(--paper2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:7px;animation:fadeUp .2s ease}
+.med-row-grid{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:7px;align-items:end}
+.med-sub{font-size:11px;color:var(--forest);font-weight:700;text-align:right;margin-top:4px}
+.med-rm{width:26px;height:26px;background:var(--rust-l);border:1px solid var(--rust-m);color:var(--rust);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex-shrink:0;transition:background .12s;align-self:end}
+.med-rm:hover{background:var(--rust-m)}
+
+.bill-box{background:var(--forest-l);border:1px solid var(--forest-m);border-radius:9px;padding:12px 14px;margin-top:10px}
+.bill-row{display:flex;justify-content:space-between;font-size:12.5px;padding:3px 0}
+.bill-row .l{color:var(--ink2)}
+.bill-row .v{font-weight:600}
+.bill-hr{height:1px;background:var(--forest-m);margin:6px 0}
+.bill-total{display:flex;justify-content:space-between;align-items:center}
+.bill-total-v{font-family:'Lora',serif;font-size:1.15rem;color:var(--forest);font-weight:700}
+
+.alert-item{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border)}
+.alert-item:last-child{border-bottom:none}
+.alert-dot{width:6px;height:6px;border-radius:50%;background:var(--rust);margin-right:8px;flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+#toast{position:fixed;bottom:18px;right:18px;z-index:300;pointer-events:none;display:none}
+.t-in{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;font-size:12.5px;font-weight:600;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow-lg);animation:slideIn .22s cubic-bezier(.34,1.56,.64,1)}
+@keyframes slideIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+.t-in.ok{border-left:3px solid var(--forest)}
+.t-in.err{border-left:3px solid var(--rust)}
+.t-in.info{border-left:3px solid var(--sky)}
+.t-in.warn{border-left:3px solid var(--gold)}
+
+.pos{color:var(--forest);font-weight:700}
+.neg{color:var(--rust);font-weight:700}
+.sec-div{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:4px 0}
+
+.empty{text-align:center;padding:32px 16px;color:var(--ink3)}
+.empty .ei{font-size:1.9rem;display:block;margin-bottom:8px}
+.empty p{font-size:12.5px}
+
+.edit-banner{display:none;background:var(--gold-l);border:1.5px solid var(--gold-m);border-radius:9px;padding:9px 13px;margin-bottom:12px;font-size:12.5px;color:var(--gold);font-weight:600;align-items:center;justify-content:space-between;gap:8px}
+.edit-banner.show{display:flex}
+
+/* Loading overlay */
+#loading-overlay{position:fixed;inset:0;background:var(--paper);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+#loading-overlay .spinner{width:44px;height:44px;border:4px solid var(--forest-m);border-top-color:var(--forest);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading-overlay p{font-family:'Lora',serif;font-style:italic;color:var(--forest);font-size:1rem}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+@media(max-width:960px){
+  .module-grid{grid-template-columns:1fr}
+  .med-row-grid{grid-template-columns:1fr 1fr}
+  .med-row-grid>*:first-child{grid-column:1/-1}
+}
+@media(max-width:640px){
+  .f-2col{grid-template-columns:1fr}
+  .g-stats{display:none}
+  .tab-btn{padding:8px 12px;font-size:12px}
+  .app-wrap{padding:12px 12px 50px}
+}
+
+/* ══ PRINT STYLES ══ */
+@media print{
+  .g-header,.tab-bar,.module-grid>*:first-child,
+  .card-head .btn,.card-head .btn-sm,.card-head .btn-xs,
+  #toast,#loading-overlay,.f-err,.f-success,.edit-banner,
+  .no-print,.mx-btn,.btn-primary,.btn-cancel,
+  .btn-rust,.btn-gold,.btn-sky,.btn-forest,.med-rm{display:none!important}
+  body{background:#fff!important;color:#000;font-size:11px}
+  .app-wrap{padding:0;max-width:100%}
+  body.master-print .tab-pane{display:block!important}
+  body:not(.master-print) .tab-pane{display:none!important}
+  body:not(.master-print) .tab-pane.active{display:block!important}
+  .print-header{display:block!important;text-align:center;padding:14px 0 12px;border-bottom:2px solid #ccc;margin-bottom:14px}
+  .print-header h1{font-family:'Lora',serif;font-style:italic;font-size:1.6rem;color:#1e3a1a}
+  .print-header p{font-size:11px;color:#666;margin-top:3px}
+  .print-sec-title{font-family:'Lora',serif;font-style:italic;font-size:1.1rem;color:#1e3a1a;padding:10px 0 5px;border-bottom:1px solid #ccc;margin:14px 0 8px;break-before:page}
+  .print-sec-title:first-of-type{break-before:avoid}
+  .card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid;margin-bottom:12px}
+  .module-grid{display:block!important}
+  .tbl th{background:#f0ede2!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .tbl tbody tr.row-low td{background:rgba(122,42,24,.05)!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  @page{margin:13mm;size:A4}
+}
+.print-header,.print-sec-title{display:none}
+.tbl tbody tr.editing-row td{background:rgba(138,96,32,.06)!important;border-left:3px solid var(--gold)}
+</style>
 </head>
-<body class="bg-stone-100 text-stone-900 p-4 md:p-8">
+<body>
 
-    <!-- Header Status -->
-    <div class="max-w-7xl mx-auto mb-6 bg-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row justify-between items-center border-l-4 border-emerald-800">
-        <div class="flex items-center gap-3">
-            <div class="text-2xl">🐾</div>
-            <div>
-                <h1 class="text-2xl font-bold text-emerald-950">Mr. Bilai Pet Clinic</h1>
-                <p class="text-sm text-gray-500">Live Client ERP Dashboard</p>
-            </div>
-        </div>
-        <div id="db-status" class="mt-3 md:mt-0 px-4 py-1.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
-            Connecting Core System...
-        </div>
+<!-- Loading Overlay (hidden once Firebase data loads) -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p>Connecting to Mr. Bilai Clinic database…</p>
+</div>
+
+<!-- Print-only master header -->
+<div class="print-header" id="printHeader">
+  <h1>🐾 Mr. Bilai Pet Clinic</h1>
+  <p>Full System Report · <span id="printDate"></span></p>
+</div>
+
+<!-- ══ GLOBAL HEADER ══ -->
+<header class="g-header no-print">
+  <div class="g-header-inner">
+    <div>
+      <div class="brand-text">Mr. Bilai Pet Clinic 🐾</div>
+      <div class="brand-sub">Stock · Sales · Clinic ERP</div>
     </div>
-
-    <!-- Navigation Tabs -->
-    <div class="max-w-7xl mx-auto mb-6 flex gap-2 border-b border-gray-200 pb-2">
-        <button onclick="switchTab('inventory')" id="tab-inventory" class="px-4 py-2 bg-emerald-800 text-white rounded-lg font-medium tab-btn">Inventory</button>
-        <button onclick="switchTab('sales')" id="tab-sales" class="px-4 py-2 text-gray-600 rounded-lg font-medium tab-btn hover:bg-gray-200">Counter Sales</button>
-        <button onclick="switchTab('patients')" id="tab-patients" class="px-4 py-2 text-gray-600 rounded-lg font-medium tab-btn hover:bg-gray-200">Patient Visits</button>
+    <div class="g-stats">
+      <div class="g-stat"><div class="g-stat-val" id="gs-items">—</div><div class="g-stat-lbl">Items in Stock</div></div>
+      <div class="g-stat"><div class="g-stat-val" id="gs-value">—</div><div class="g-stat-lbl">Stock Value</div></div>
+      <div class="g-stat"><div class="g-stat-val" id="gs-sales">—</div><div class="g-stat-lbl">Total Sales</div></div>
+      <div class="g-stat"><div class="g-stat-val" id="gs-visits">—</div><div class="g-stat-lbl">Total Visits</div></div>
     </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="mx-btn mx-excel" onclick="masterCSV()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="13" height="13"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Master Excel
+      </button>
+      <button class="mx-btn mx-pdf" onclick="masterPDF()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="13" height="13"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Master PDF
+      </button>
+    </div>
+  </div>
+</header>
 
-    <!-- Main Dynamic Layout -->
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Left: Forms -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
-            <!-- Inventory -->
-            <div id="form-inventory" class="tab-content">
-                <h3 class="text-lg font-bold mb-4 text-emerald-900">Add Stock Item</h3>
-                <form id="invForm" onsubmit="handleInventorySubmit(event)" class="space-y-4">
-                    <input type="text" id="inv-name" required placeholder="Item Name (e.g. Vaccine)" class="w-full p-2.5 border rounded-lg">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="number" id="inv-buy" step="0.01" required placeholder="Buy Price" class="w-full p-2.5 border rounded-lg">
-                        <input type="number" id="inv-qty" required placeholder="Qty" class="w-full p-2.5 border rounded-lg">
-                    </div>
-                    <button type="submit" class="w-full bg-emerald-800 text-white p-2.5 rounded-lg font-medium">Save Item</button>
-                </form>
-            </div>
+<!-- ══ APP WRAPPER ══ -->
+<div class="app-wrap">
 
-            <!-- Sales -->
-            <div id="form-sales" class="tab-content hidden">
-                <h3 class="text-lg font-bold mb-4 text-emerald-900">New Sale Invoice</h3>
-                <form id="saleForm" onsubmit="handleSaleSubmit(event)" class="space-y-4">
-                    <input type="text" id="sale-customer" required placeholder="Customer Name" class="w-full p-2.5 border rounded-lg">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="number" id="sale-total" required placeholder="Total Bill (Tk)" class="w-full p-2.5 border rounded-lg">
-                        <select id="sale-method" class="w-full p-2.5 border rounded-lg">
-                            <option value="Cash">Cash</option>
-                            <option value="bKash">bKash</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="w-full bg-emerald-800 text-white p-2.5 rounded-lg font-medium">Process Sale</button>
-                </form>
-            </div>
+  <!-- Module Tabs -->
+  <div class="tab-bar no-print">
+    <button class="tab-btn active" onclick="switchTab('inventory',this)">📦 Inventory</button>
+    <button class="tab-btn" onclick="switchTab('sales',this)">🛒 Counter Sales</button>
+    <button class="tab-btn" onclick="switchTab('visits',this)">🐾 Patient Visits</button>
+  </div>
 
-            <!-- Patients -->
-            <div id="form-patients" class="tab-content hidden">
-                <h3 class="text-lg font-bold mb-4 text-emerald-900">Patient Registration</h3>
-                <form id="patientForm" onsubmit="handlePatientSubmit(event)" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="text" id="p-name" required placeholder="Pet Name" class="w-full p-2.5 border rounded-lg">
-                        <input type="text" id="p-type" required placeholder="Type (e.g. Dog)" class="w-full p-2.5 border rounded-lg">
-                    </div>
-                    <textarea id="p-symptoms" required placeholder="Symptoms" class="w-full p-2.5 border rounded-lg"></textarea>
-                    <button type="submit" class="w-full bg-emerald-800 text-white p-2.5 rounded-lg font-medium">Check-in Patient</button>
-                </form>
+  <!-- ════ MODULE A: INVENTORY ════ -->
+  <div class="tab-pane active" id="tab-inventory">
+    <div class="print-sec-title">Module A — Inventory &amp; Stock Ledger</div>
+    <div class="module-grid">
+
+      <div>
+        <div class="card">
+          <div class="card-head">
+            <h3 id="inv-form-title">Add Stock Item</h3>
+          </div>
+          <div class="card-body">
+            <input type="hidden" id="inv-edit-id"/>
+            <div class="edit-banner" id="inv-edit-banner">
+              <span>✏️ Editing item — make changes and save</span>
+              <button class="btn btn-cancel btn-xs" onclick="cancelInvEdit()">Cancel</button>
             </div>
+            <div class="f-row">
+              <label class="f-label">Item Name *</label>
+              <input type="text" id="inv-name" class="f-in" placeholder="e.g. Amoxicillin 250mg"/>
+            </div>
+            <div class="f-2col">
+              <div class="f-row" style="margin:0">
+                <label class="f-label">Category *</label>
+                <select id="inv-cat" class="f-in">
+                  <option value="Medicine">💊 Medicine</option>
+                  <option value="Accessories">🎀 Accessories</option>
+                </select>
+              </div>
+              <div class="f-row" style="margin:0">
+                <label class="f-label">Transaction Date</label>
+                <input type="date" id="inv-date" class="f-in"/>
+              </div>
+            </div>
+            <div class="f-2col" style="margin-top:12px">
+              <div class="f-row" style="margin:0">
+                <label class="f-label">Unit Buy Price ৳ *</label>
+                <input type="number" id="inv-buy" class="f-in" placeholder="0.00" min="0" step="0.01"/>
+              </div>
+              <div class="f-row" style="margin:0">
+                <label class="f-label">Stock Qty *</label>
+                <input type="number" id="inv-stock" class="f-in" placeholder="0" min="0"/>
+              </div>
+            </div>
+            <div id="inv-err" class="f-err"></div>
+            <div id="inv-ok" class="f-success"></div>
+            <div style="display:flex;gap:8px;margin-top:14px">
+              <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="saveInvItem()">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save Item
+              </button>
+              <button class="btn btn-cancel" id="inv-cancel-btn" style="display:none" onclick="cancelInvEdit()">Cancel</button>
+            </div>
+          </div>
         </div>
 
-        <!-- Right: Dynamic Sync Database Table -->
-        <div class="lg:col-span-2">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 id="table-title" class="text-lg font-bold mb-4 text-stone-800">Live Inventory Items</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-gray-50 text-gray-500 text-xs uppercase" id="table-headers">
-                            <tr><th class="p-3">Item Name</th><th class="p-3">Buy Price</th><th class="p-3">Qty</th><th class="p-3">Action</th></tr>
-                        </thead>
-                        <tbody id="data-rows" class="divide-y divide-gray-100">
-                            <tr><td colspan="4" class="p-4 text-center text-gray-400">Loading Cloud Data...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="card" style="margin-top:12px">
+          <div class="card-head"><h3>Stock Valuation</h3></div>
+          <div class="card-body" style="padding:12px 16px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--ink2)">Total Products</span><strong id="sv-products">0</strong></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--ink2)">Total Units</span><strong id="sv-units">0</strong></div>
+            <div class="sec-div"></div>
+            <div style="display:flex;justify-content:space-between;font-size:14px;margin-top:6px"><span style="font-weight:600">Total Value</span><strong id="sv-value" style="color:var(--forest);font-family:'Lora',serif;font-size:1.1rem">৳0</strong></div>
+          </div>
         </div>
+      </div>
 
+      <div class="card">
+        <div class="card-head">
+          <h3>Stock Ledger <span id="inv-count" style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:6px">0 items</span></h3>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <select id="inv-filter-cat" class="f-in" style="width:auto;padding:5px 28px 5px 10px;font-size:12px" onchange="renderInv()">
+              <option value="">All Categories</option>
+              <option value="Medicine">Medicine</option>
+              <option value="Accessories">Accessories</option>
+            </select>
+            <button class="btn btn-sky btn-sm no-print" onclick="exportInvCSV()">CSV</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead><tr>
+              <th>#</th><th>Date</th><th>Item Name</th><th>Category</th>
+              <th>Buy Price</th><th>Stock</th><th>Total Value</th><th>Status</th>
+              <th class="no-print">Actions</th>
+            </tr></thead>
+            <tbody id="inv-tbody"></tbody>
+            <tfoot id="inv-tfoot"></tfoot>
+          </table>
+          <div id="inv-empty" class="empty" style="display:none"><span class="ei">📦</span><p>No stock items yet. Add your first product above.</p></div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Core Runtime Execution Scripts -->
-    <script>
-        // Exact credentials matching your screenshots configuration database profile
-        const firebaseConfig = {
-            apiKey: "AIzaSyAEsmdGyKJv4Lx4F2aUKCGSMZ2MaBgVoQY",
-            authDomain: "mr-bilai-pet-clinic.firebaseapp.com",
-            projectId: "mr-bilai-pet-clinic",
-            storageBucket: "mr-bilai-pet-clinic.appspot.com", 
-            databaseURL: "https://mr-bilai-pet-clinic-default-rtdb.firebaseio.com/",
-            messagingSenderId: "761164198761",
-            appId: "1:761164198761:web:cfa8202c4448bfb18b83f8"
-        };
+  <!-- ════ MODULE B: COUNTER SALES ════ -->
+  <div class="tab-pane" id="tab-sales">
+    <div class="print-sec-title">Module B — Counter Sales Log</div>
+    <div class="module-grid">
 
-        // Try catch block to completely bypass blank freeze screen bugs
-        try {
-            firebase.initializeApp(firebaseConfig);
-            var db = firebase.database();
-            document.getElementById("db-status").innerText = "Cloud Online 🟢";
-            document.getElementById("db-status").className = "mt-3 md:mt-0 px-4 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-800";
-        } catch(err) {
-            console.error(err);
-            document.getElementById("db-status").innerText = "Config Connection Error 🔴";
+      <div class="card">
+        <div class="card-head">
+          <h3 id="sale-form-title">Record a Sale</h3>
+        </div>
+        <div class="card-body">
+          <input type="hidden" id="sale-edit-id"/>
+          <div class="edit-banner" id="sale-edit-banner">
+            <span>✏️ Editing sale — update and save</span>
+            <button class="btn btn-cancel btn-xs" onclick="cancelSaleEdit()">Cancel</button>
+          </div>
+          <div class="f-row">
+            <label class="f-label">Transaction Date</label>
+            <input type="date" id="sale-date" class="f-in"/>
+          </div>
+          <div class="f-row">
+            <label class="f-label">Select Product *</label>
+            <select id="sale-prod" class="f-in" onchange="onSaleProdChange()">
+              <option value="">— Choose product —</option>
+            </select>
+          </div>
+          <div id="sale-prod-info" style="display:none;background:var(--paper2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:12.5px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--ink2)">Buy Price</span><strong id="spi-buy"></strong></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--ink2)">In Stock</span><strong id="spi-stock" style="color:var(--forest)"></strong></div>
+          </div>
+          <div class="f-2col">
+            <div class="f-row" style="margin:0">
+              <label class="f-label">Sell Price ৳ <span class="tag">flexible</span></label>
+              <input type="number" id="sale-sell" class="f-in" placeholder="0.00" min="0" step="0.01" oninput="updateSalePrev()"/>
+            </div>
+            <div class="f-row" style="margin:0">
+              <label class="f-label">Quantity *</label>
+              <input type="number" id="sale-qty" class="f-in" value="1" min="1" oninput="updateSalePrev()"/>
+            </div>
+          </div>
+          <div id="sale-prev" style="display:none;background:var(--forest-l);border:1px solid var(--forest-m);border-radius:9px;padding:11px 13px;margin-top:12px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--ink2)">Revenue</span><span id="sp-rev" style="font-weight:600"></span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--ink2)">Cost</span><span id="sp-cost" style="font-weight:600"></span></div>
+            <div style="height:1px;background:var(--forest-m);margin-bottom:6px"></div>
+            <div style="display:flex;justify-content:space-between;font-size:13.5px"><span style="font-weight:700">Net Profit</span><span id="sp-profit" style="font-weight:800;font-size:1rem"></span></div>
+          </div>
+          <div id="sale-err" class="f-err"></div>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="saveSale()">✓ Confirm Sale</button>
+            <button class="btn btn-cancel" id="sale-cancel-btn" style="display:none" onclick="cancelSaleEdit()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Sales Log <span id="sale-count" style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:6px">0 transactions</span></h3>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+            <div style="display:flex;gap:6px">
+              <input type="date" id="sale-filter-from" class="f-in no-print" style="width:auto;padding:5px 9px;font-size:12px" onchange="renderSales()"/>
+              <input type="date" id="sale-filter-to" class="f-in no-print" style="width:auto;padding:5px 9px;font-size:12px" onchange="renderSales()"/>
+            </div>
+            <button class="btn btn-sky btn-sm no-print" onclick="exportSalesCSV()">CSV</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead><tr>
+              <th>#</th><th>Date</th><th>Product</th><th>Qty</th>
+              <th>Sell ৳</th><th>Revenue</th><th>Profit</th>
+              <th class="no-print">Actions</th>
+            </tr></thead>
+            <tbody id="sale-tbody"></tbody>
+            <tfoot id="sale-tfoot"></tfoot>
+          </table>
+          <div id="sale-empty" class="empty" style="display:none"><span class="ei">🛒</span><p>No sales recorded yet.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ MODULE C: PATIENT VISITS ════ -->
+  <div class="tab-pane" id="tab-visits">
+    <div class="print-sec-title">Module C — Patient Visit Records</div>
+    <div class="module-grid">
+
+      <div class="card">
+        <div class="card-head">
+          <h3 id="visit-form-title">Register Visit</h3>
+        </div>
+        <div class="card-body" style="max-height:calc(100vh - 160px);overflow-y:auto">
+          <input type="hidden" id="visit-edit-id"/>
+          <div class="edit-banner" id="visit-edit-banner">
+            <span>✏️ Editing visit record</span>
+            <button class="btn btn-cancel btn-xs" onclick="cancelVisitEdit()">Cancel</button>
+          </div>
+          <div class="f-row">
+            <label class="f-label">Visit Date</label>
+            <input type="date" id="visit-date" class="f-in"/>
+          </div>
+          <div class="f-2col">
+            <div class="f-row" style="margin:0">
+              <label class="f-label">Owner Name *</label>
+              <input type="text" id="visit-owner" class="f-in" placeholder="Owner's name"/>
+            </div>
+            <div class="f-row" style="margin:0">
+              <label class="f-label">Pet Name *</label>
+              <input type="text" id="visit-pet" class="f-in" placeholder="Pet's name"/>
+            </div>
+          </div>
+          <div class="f-row" style="margin-top:10px">
+            <label class="f-label">Consultation Fee ৳ <span class="tag">flexible</span></label>
+            <input type="number" id="visit-fee" class="f-in" placeholder="0.00" min="0" step="0.01" oninput="updateVisitBill()"/>
+          </div>
+          <div style="margin-top:6px;margin-bottom:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+              <label class="f-label" style="margin:0">Medicines Used</label>
+              <button class="btn btn-forest btn-xs no-print" onclick="addMedRow()">+ Add</button>
+            </div>
+            <div id="med-rows-container"></div>
+            <p id="no-med-note" style="font-size:11.5px;color:var(--ink4);padding:4px">No medicines added.</p>
+          </div>
+          <div id="visit-bill-box" style="display:none">
+            <div class="bill-box">
+              <div class="bill-row"><span class="l">Consult. Fee</span><span class="v" id="vb-fee">৳0</span></div>
+              <div id="vb-meds"></div>
+              <div class="bill-hr"></div>
+              <div class="bill-total"><span style="font-weight:700;font-size:14px">Total Bill</span><span class="bill-total-v" id="vb-total">৳0</span></div>
+            </div>
+          </div>
+          <div id="visit-err" class="f-err"></div>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <button class="btn" style="flex:1;justify-content:center;background:var(--rust);color:#fff;border:none;font-weight:700;border-radius:8px;padding:9px;cursor:pointer;box-shadow:0 2px 8px rgba(122,42,24,.3)" onclick="saveVisit()">🐾 Save Visit</button>
+            <button class="btn btn-cancel" id="visit-cancel-btn" style="display:none" onclick="cancelVisitEdit()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Visit Records <span id="visit-count" style="font-size:11px;color:var(--ink3);font-weight:400;margin-left:6px">0 visits</span></h3>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+            <div style="display:flex;gap:6px">
+              <input type="date" id="visit-filter-from" class="f-in no-print" style="width:auto;padding:5px 9px;font-size:12px" onchange="renderVisits()"/>
+              <input type="date" id="visit-filter-to" class="f-in no-print" style="width:auto;padding:5px 9px;font-size:12px" onchange="renderVisits()"/>
+            </div>
+            <button class="btn btn-sky btn-sm no-print" onclick="exportVisitsCSV()">CSV</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead><tr>
+              <th>#</th><th>Date</th><th>Pet / Owner</th>
+              <th>Visit Fee</th><th>Medicines</th><th>Med Total</th><th>Total Bill</th>
+              <th class="no-print">Actions</th>
+            </tr></thead>
+            <tbody id="visit-tbody"></tbody>
+            <tfoot id="visit-tfoot"></tfoot>
+          </table>
+          <div id="visit-empty" class="empty" style="display:none"><span class="ei">🐾</span><p>No visits recorded yet.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app-wrap -->
+
+<footer style="text-align:center;padding:14px;font-size:11.5px;color:var(--ink3);border-top:1px solid var(--border);background:var(--paper2)">
+  🐾 Mr. Bilai Pet Clinic &nbsp;·&nbsp; Designed by <strong style="color:var(--forest)">Tahmid</strong>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  FIREBASE CONFIGURATION — Mr. Bilai Pet Clinic
+// ══════════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey:            "AIzaSyAEsmdGyKJv4Lx4F2aUKCGSMZ2MaBgVoQY",
+  authDomain:        "mr-bilai-pet-clinic.firebaseapp.com",
+  projectId:         "mr-bilai-pet-clinic",
+  storageBucket:     "mr-bilai-pet-clinic.firebasestorage.app",
+  messagingSenderId: "761164198761",
+  appId:             "1:761164198761:web:cfa8202c4448bfb18b83f8"
+};
+
+// ── In-memory state arrays (synced by onSnapshot) ──
+let inventory = [];
+let sales     = [];
+let visits    = [];
+
+// ── Editing state ──
+let invEditing   = null;
+let saleEditing  = null;
+let visitEditing = null;
+let medRowCtr    = 0;
+
+// ── Firebase refs (assigned after DOM ready) ──
+let db, invCol, salesCol, visitsCol;
+
+// ── Listener readiness tracking ──
+let _listenersReady = 0;
+function _checkAllReady() {
+  _listenersReady++;
+  if (_listenersReady >= 3) {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) overlay.style.display = 'none';
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════════════════
+const uid     = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+const fmt     = n  => '৳' + Number(n).toFixed(2);
+const todayISO= () => new Date().toISOString().split('T')[0];
+const fmtDate = d  => d || '—';
+const esc     = s  => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const nowStr  = () => {
+  const d = new Date();
+  return d.toLocaleDateString('en-GB') + ' ' + d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+};
+
+function toast(msg, type = 'ok') {
+  const el = document.getElementById('toast');
+  el.innerHTML = `<div class="t-in ${type}">${msg}</div>`;
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.style.display = 'none', 3200);
+}
+
+function setErrMsg(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function setOkMsg(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+  setTimeout(() => { if (el) el.style.display = 'none'; }, 2500);
+}
+
+// ══════════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════════
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  if (name === 'sales') populateSaleDropdown();
+  if (name === 'visits') populateVisitMedDropdowns();
+  updateGlobalStats();
+}
+
+// ══════════════════════════════════════════════════
+//  GLOBAL STATS
+// ══════════════════════════════════════════════════
+function updateGlobalStats() {
+  const totalUnits = inventory.reduce((a, p) => a + p.stock, 0);
+  const totalVal   = inventory.reduce((a, p) => a + p.stock * p.buyPrice, 0);
+  document.getElementById('gs-items').textContent  = totalUnits;
+  document.getElementById('gs-value').textContent  = fmt(totalVal);
+  document.getElementById('gs-sales').textContent  = sales.length;
+  document.getElementById('gs-visits').textContent = visits.length;
+  document.getElementById('sv-products').textContent = inventory.length;
+  document.getElementById('sv-units').textContent    = totalUnits;
+  document.getElementById('sv-value').textContent    = fmt(totalVal);
+}
+
+// ══════════════════════════════════════════════════
+//  MODULE A — INVENTORY
+// ══════════════════════════════════════════════════
+function initInvDate() { document.getElementById('inv-date').value = todayISO(); }
+
+async function saveInvItem() {
+  const name     = document.getElementById('inv-name').value.trim();
+  const cat      = document.getElementById('inv-cat').value;
+  const date     = document.getElementById('inv-date').value || todayISO();
+  const buyPrice = parseFloat(document.getElementById('inv-buy').value);
+  const stock    = parseInt(document.getElementById('inv-stock').value);
+
+  setErrMsg('inv-err', '');
+  if (!name)                         return setErrMsg('inv-err', '⚠ Item name is required.');
+  if (isNaN(buyPrice) || buyPrice<0) return setErrMsg('inv-err', '⚠ Enter a valid buy price.');
+  if (isNaN(stock) || stock<0)       return setErrMsg('inv-err', '⚠ Enter a valid stock quantity.');
+
+  try {
+    if (invEditing) {
+      await invCol.doc(invEditing).update({ name, category: cat, date, buyPrice, stock });
+      toast('✏️ Item updated!', 'warn');
+      setOkMsg('inv-ok', '✓ Item updated successfully.');
+      cancelInvEdit();
+    } else {
+      const dupe = inventory.find(x => x.name.toLowerCase() === name.toLowerCase());
+      if (dupe) {
+        await invCol.doc(dupe.id).update({ stock: dupe.stock + stock, buyPrice, date });
+        toast(`➕ Stock added to "${name}"`, 'ok');
+        setOkMsg('inv-ok', `✓ Added ${stock} units to "${name}".`);
+      } else {
+        await invCol.add({ name, category: cat, date, buyPrice, stock });
+        toast('✅ Item added!', 'ok');
+        setOkMsg('inv-ok', '✓ New item added to inventory.');
+      }
+      clearInvForm();
+    }
+  } catch (err) {
+    console.error('saveInvItem:', err);
+    setErrMsg('inv-err', '❌ Firestore error: ' + err.message);
+  }
+}
+
+function clearInvForm() {
+  document.getElementById('inv-name').value  = '';
+  document.getElementById('inv-cat').value   = 'Medicine';
+  document.getElementById('inv-buy').value   = '';
+  document.getElementById('inv-stock').value = '';
+  initInvDate();
+  setErrMsg('inv-err', '');
+}
+
+function editInvItem(id) {
+  const p = inventory.find(x => x.id === id);
+  if (!p) return;
+  invEditing = id;
+  document.getElementById('inv-name').value  = p.name;
+  document.getElementById('inv-cat').value   = p.category;
+  document.getElementById('inv-date').value  = p.date || todayISO();
+  document.getElementById('inv-buy').value   = p.buyPrice;
+  document.getElementById('inv-stock').value = p.stock;
+  document.getElementById('inv-form-title').textContent = 'Edit Stock Item';
+  document.getElementById('inv-edit-banner').classList.add('show');
+  document.getElementById('inv-cancel-btn').style.display = 'inline-flex';
+  document.querySelectorAll('#inv-tbody tr').forEach(r => r.classList.remove('editing-row'));
+  const row = document.querySelector(`#inv-tbody tr[data-id="${id}"]`);
+  if (row) row.classList.add('editing-row');
+  document.getElementById('inv-name').focus();
+  document.getElementById('inv-name').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function cancelInvEdit() {
+  invEditing = null;
+  document.getElementById('inv-form-title').textContent = 'Add Stock Item';
+  document.getElementById('inv-edit-banner').classList.remove('show');
+  document.getElementById('inv-cancel-btn').style.display = 'none';
+  document.querySelectorAll('#inv-tbody tr').forEach(r => r.classList.remove('editing-row'));
+  clearInvForm();
+}
+
+async function deleteInvItem(id) {
+  if (!confirm('Delete this inventory item? Referenced sales data remains but stock won\'t be restored.')) return;
+  try {
+    await invCol.doc(id).delete();
+    if (invEditing === id) cancelInvEdit();
+    toast('🗑️ Item deleted.', 'err');
+  } catch (err) {
+    console.error('deleteInvItem:', err);
+    toast('❌ Delete failed: ' + err.message, 'err');
+  }
+}
+
+function renderInv() {
+  const catFilter = document.getElementById('inv-filter-cat').value;
+  let list = catFilter ? inventory.filter(p => p.category === catFilter) : inventory;
+  const sorted = [...list].sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+  const tb = document.getElementById('inv-tbody');
+  const em = document.getElementById('inv-empty');
+  const ft = document.getElementById('inv-tfoot');
+  document.getElementById('inv-count').textContent = inventory.length + ' items';
+
+  if (!sorted.length) { tb.innerHTML=''; ft.innerHTML=''; em.style.display='block'; return; }
+  em.style.display = 'none';
+
+  let i = 0;
+  tb.innerHTML = sorted.map(p => {
+    const low = p.stock <= 5, rowVal = p.stock * p.buyPrice;
+    return `<tr class="${low?'row-low':''}" data-id="${p.id}">
+      <td style="color:var(--ink3)">${++i}</td>
+      <td style="font-size:11.5px;color:var(--ink3)">${fmtDate(p.date)}</td>
+      <td style="font-weight:600">${esc(p.name)}</td>
+      <td>${p.category==='Medicine'?'<span class="badge b-med">💊 Med</span>':'<span class="badge b-acc">🎀 Acc</span>'}</td>
+      <td>${fmt(p.buyPrice)}</td>
+      <td style="${low?'color:var(--rust);font-weight:700':''}">${p.stock}</td>
+      <td style="font-weight:600;color:var(--forest)">${fmt(rowVal)}</td>
+      <td>${low?'<span class="badge b-low">⚠ Low</span>':'<span class="badge b-ok">✓ OK</span>'}</td>
+      <td class="no-print">
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-gold btn-sm" onclick="editInvItem('${p.id}')">Edit</button>
+          <button class="btn btn-rust btn-sm" onclick="deleteInvItem('${p.id}')">Del</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const totalVal   = sorted.reduce((a,p) => a + p.stock*p.buyPrice, 0);
+  const totalUnits = sorted.reduce((a,p) => a + p.stock, 0);
+  ft.innerHTML = `<tr><td colspan="6" style="text-align:right;color:var(--ink2)">Subtotal</td><td style="color:var(--forest)">${fmt(totalVal)}</td><td colspan="2" style="color:var(--ink3);font-size:11px">${totalUnits} units</td></tr>`;
+  updateGlobalStats();
+}
+
+// ══════════════════════════════════════════════════
+//  MODULE B — COUNTER SALES
+// ══════════════════════════════════════════════════
+function initSaleDate() { document.getElementById('sale-date').value = todayISO(); }
+
+function populateSaleDropdown() {
+  const sel = document.getElementById('sale-prod');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Choose product —</option>';
+  inventory.forEach(p => {
+    sel.innerHTML += `<option value="${p.id}">${esc(p.name)} (Stock: ${p.stock})</option>`;
+  });
+  if (cur) sel.value = cur;
+}
+
+function onSaleProdChange() {
+  const p = inventory.find(x => x.id === document.getElementById('sale-prod').value);
+  const infoBox = document.getElementById('sale-prod-info');
+  if (!p) { infoBox.style.display='none'; document.getElementById('sale-prev').style.display='none'; return; }
+  document.getElementById('spi-buy').textContent   = fmt(p.buyPrice);
+  document.getElementById('spi-stock').textContent = p.stock;
+  infoBox.style.display = 'block';
+  if (!saleEditing) document.getElementById('sale-sell').value = '';
+  updateSalePrev();
+}
+
+function updateSalePrev() {
+  const p   = inventory.find(x => x.id === document.getElementById('sale-prod').value);
+  const qty = parseInt(document.getElementById('sale-qty').value) || 0;
+  const sp  = parseFloat(document.getElementById('sale-sell').value) || 0;
+  if (!p || qty <= 0 || sp <= 0) { document.getElementById('sale-prev').style.display='none'; return; }
+  const rev=sp*qty, cost=p.buyPrice*qty, profit=rev-cost;
+  document.getElementById('sp-rev').textContent  = fmt(rev);
+  document.getElementById('sp-cost').textContent = fmt(cost);
+  const pe = document.getElementById('sp-profit');
+  pe.textContent = fmt(profit);
+  pe.className   = profit >= 0 ? 'pos' : 'neg';
+  document.getElementById('sale-prev').style.display = 'block';
+}
+
+async function saveSale() {
+  const date   = document.getElementById('sale-date').value || todayISO();
+  const prodId = document.getElementById('sale-prod').value;
+  const qty    = parseInt(document.getElementById('sale-qty').value);
+  const sp     = parseFloat(document.getElementById('sale-sell').value);
+
+  setErrMsg('sale-err', '');
+  const p = inventory.find(x => x.id === prodId);
+  if (!p)               return setErrMsg('sale-err', '⚠ Please select a product.');
+  if (!qty || qty <= 0) return setErrMsg('sale-err', '⚠ Enter a valid quantity.');
+  if (isNaN(sp)||sp<=0) return setErrMsg('sale-err', '⚠ Enter a valid selling price.');
+
+  try {
+    const batch = db.batch();
+
+    if (saleEditing) {
+      const old = sales.find(x => x.id === saleEditing);
+      if (!old) return;
+      const oldInvDoc = inventory.find(x => x.id === old.productId);
+      const newInvDoc = inventory.find(x => x.id === prodId);
+
+      if (old.productId === prodId) {
+        const stockAfterRestore = (oldInvDoc ? oldInvDoc.stock : 0) + old.qty;
+        const finalStock = stockAfterRestore - qty;
+        if (finalStock < 0) return setErrMsg('sale-err', `❌ Only ${stockAfterRestore} units available.`);
+        batch.update(invCol.doc(prodId), { stock: finalStock });
+      } else {
+        if (oldInvDoc) batch.update(invCol.doc(old.productId), { stock: oldInvDoc.stock + old.qty });
+        if (!newInvDoc || qty > newInvDoc.stock) return setErrMsg('sale-err', `❌ Only ${newInvDoc ? newInvDoc.stock : 0} units of "${p.name}" in stock.`);
+        batch.update(invCol.doc(prodId), { stock: newInvDoc.stock - qty });
+      }
+
+      batch.update(salesCol.doc(saleEditing), {
+        date, productId: prodId, productName: p.name,
+        qty, sellPrice: sp, buyPrice: p.buyPrice,
+        revenue: sp * qty, profit: (sp - p.buyPrice) * qty
+      });
+      await batch.commit();
+      toast('✏️ Sale updated!', 'warn');
+      cancelSaleEdit();
+    } else {
+      if (qty > p.stock) return setErrMsg('sale-err', `❌ Only ${p.stock} units in stock.`);
+      batch.update(invCol.doc(prodId), { stock: p.stock - qty });
+      const newSaleRef = salesCol.doc();
+      batch.set(newSaleRef, {
+        date, productId: prodId, productName: p.name,
+        qty, sellPrice: sp, buyPrice: p.buyPrice,
+        revenue: sp * qty, profit: (sp - p.buyPrice) * qty
+      });
+      await batch.commit();
+      clearSaleForm();
+      toast(`🎉 Sale! Profit: ${fmt((sp - p.buyPrice) * qty)}`, 'ok');
+    }
+  } catch (err) {
+    console.error('saveSale:', err);
+    setErrMsg('sale-err', '❌ Firestore error: ' + err.message);
+  }
+}
+
+function clearSaleForm() {
+  document.getElementById('sale-prod').value = '';
+  document.getElementById('sale-sell').value = '';
+  document.getElementById('sale-qty').value  = 1;
+  document.getElementById('sale-prod-info').style.display = 'none';
+  document.getElementById('sale-prev').style.display = 'none';
+  setErrMsg('sale-err', '');
+  initSaleDate();
+}
+
+function editSaleItem(id) {
+  const s = sales.find(x => x.id === id);
+  if (!s) return;
+  saleEditing = id;
+  populateSaleDropdown();
+  document.getElementById('sale-date').value = s.date || todayISO();
+  document.getElementById('sale-prod').value = s.productId;
+  onSaleProdChange();
+  document.getElementById('sale-sell').value = s.sellPrice;
+  document.getElementById('sale-qty').value  = s.qty;
+  updateSalePrev();
+  document.getElementById('sale-form-title').textContent = 'Edit Sale Record';
+  document.getElementById('sale-edit-banner').classList.add('show');
+  document.getElementById('sale-cancel-btn').style.display = 'inline-flex';
+  document.querySelectorAll('#sale-tbody tr').forEach(r => r.classList.remove('editing-row'));
+  const row = document.querySelector(`#sale-tbody tr[data-id="${id}"]`);
+  if (row) row.classList.add('editing-row');
+  document.getElementById('sale-prod').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function cancelSaleEdit() {
+  saleEditing = null;
+  document.getElementById('sale-form-title').textContent = 'Record a Sale';
+  document.getElementById('sale-edit-banner').classList.remove('show');
+  document.getElementById('sale-cancel-btn').style.display = 'none';
+  document.querySelectorAll('#sale-tbody tr').forEach(r => r.classList.remove('editing-row'));
+  clearSaleForm();
+}
+
+async function deleteSale(id) {
+  if (!confirm('Delete this sale? Stock will be restored.')) return;
+  const s = sales.find(x => x.id === id);
+  try {
+    const batch = db.batch();
+    if (s) {
+      const invDoc = inventory.find(x => x.id === s.productId);
+      if (invDoc) batch.update(invCol.doc(s.productId), { stock: invDoc.stock + s.qty });
+    }
+    batch.delete(salesCol.doc(id));
+    await batch.commit();
+    if (saleEditing === id) cancelSaleEdit();
+    toast('🗑️ Sale deleted. Stock restored.', 'warn');
+  } catch (err) {
+    console.error('deleteSale:', err);
+    toast('❌ Delete failed: ' + err.message, 'err');
+  }
+}
+
+function renderSales() {
+  const from = document.getElementById('sale-filter-from').value;
+  const to   = document.getElementById('sale-filter-to').value;
+  let list = [...sales];
+  if (from) list = list.filter(s => s.date >= from);
+  if (to)   list = list.filter(s => s.date <= to);
+  list.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+  const tb = document.getElementById('sale-tbody');
+  const em = document.getElementById('sale-empty');
+  const ft = document.getElementById('sale-tfoot');
+  document.getElementById('sale-count').textContent = sales.length + ' transactions';
+
+  if (!list.length) { tb.innerHTML=''; ft.innerHTML=''; em.style.display='block'; return; }
+  em.style.display='none';
+
+  let i=0;
+  tb.innerHTML = list.map(s => `<tr data-id="${s.id}">
+    <td style="color:var(--ink3)">${++i}</td>
+    <td style="font-size:11.5px;color:var(--ink3)">${fmtDate(s.date)}</td>
+    <td style="font-weight:600">${esc(s.productName)}</td>
+    <td>${s.qty}</td>
+    <td>${fmt(s.sellPrice)}</td>
+    <td>${fmt(s.revenue)}</td>
+    <td><span class="${s.profit>=0?'b-profit':'b-loss'} badge">${fmt(s.profit)}</span></td>
+    <td class="no-print">
+      <div style="display:flex;gap:4px">
+        <button class="btn btn-gold btn-sm" onclick="editSaleItem('${s.id}')">Edit</button>
+        <button class="btn btn-rust btn-sm" onclick="deleteSale('${s.id}')">Del</button>
+      </div>
+    </td>
+  </tr>`).join('');
+
+  const tRev  = list.reduce((a,s) => a+s.revenue, 0);
+  const tProf = list.reduce((a,s) => a+s.profit,  0);
+  ft.innerHTML = `<tr><td colspan="5" style="text-align:right;color:var(--ink2)">Totals</td><td style="color:var(--sky)">${fmt(tRev)}</td><td class="${tProf>=0?'pos':'neg'}">${fmt(tProf)}</td><td></td></tr>`;
+}
+
+// ══════════════════════════════════════════════════
+//  MODULE C — PATIENT VISITS
+// ══════════════════════════════════════════════════
+function initVisitDate() { document.getElementById('visit-date').value = todayISO(); }
+
+function populateVisitMedDropdowns() {
+  document.querySelectorAll('.med-prod-sel').forEach(sel => {
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— Select product —</option>';
+    inventory.forEach(p => {
+      sel.innerHTML += `<option value="${p.id}">${esc(p.name)} (Stock:${p.stock})</option>`;
+    });
+    if (cur) sel.value = cur;
+  });
+}
+
+function addMedRow(initData) {
+  const id = ++medRowCtr;
+  document.getElementById('no-med-note').style.display = 'none';
+  let opts = '<option value="">— Select product —</option>';
+  inventory.forEach(p => { opts += `<option value="${p.id}">${esc(p.name)} (Stock:${p.stock})</option>`; });
+  const div = document.createElement('div');
+  div.className = 'med-row'; div.id = 'mr-' + id; div.dataset.rid = id;
+  div.innerHTML = `
+    <div class="med-row-grid">
+      <div><label class="f-label" style="font-size:9.5px">Product</label>
+        <select class="f-in med-prod-sel" data-rid="${id}" onchange="onMedRowChange(${id})">${opts}</select></div>
+      <div><label class="f-label" style="font-size:9.5px">Qty</label>
+        <input type="number" class="f-in med-qty" data-rid="${id}" value="${initData?.qty||1}" min="1" oninput="updateVisitBill()"/></div>
+      <div><label class="f-label" style="font-size:9.5px">Price ৳ <span class="tag">flex</span></label>
+        <input type="number" class="f-in med-price" data-rid="${id}" placeholder="0.00" value="${initData?.price||''}" min="0" step="0.01" oninput="updateVisitBill()"/></div>
+      <button class="med-rm no-print" onclick="removeMedRow(${id})">✕</button>
+    </div>
+    <div class="med-sub" id="mst-${id}"></div>`;
+  document.getElementById('med-rows-container').appendChild(div);
+  if (initData?.prodId) div.querySelector('.med-prod-sel').value = initData.prodId;
+  updateVisitBill();
+  return id;
+}
+
+function removeMedRow(id) {
+  const el = document.getElementById('mr-' + id);
+  if (el) el.remove();
+  if (!document.querySelectorAll('.med-row').length)
+    document.getElementById('no-med-note').style.display = 'block';
+  updateVisitBill();
+}
+
+function onMedRowChange(id) {
+  const sel   = document.querySelector(`.med-prod-sel[data-rid="${id}"]`);
+  const price = document.querySelector(`.med-price[data-rid="${id}"]`);
+  const p = inventory.find(x => x.id === sel.value);
+  if (p) price.value = p.buyPrice;
+  updateVisitBill();
+}
+
+function collectMedRows() {
+  return Array.from(document.querySelectorAll('.med-row')).map(row => {
+    const rid    = row.dataset.rid;
+    const prodId = row.querySelector('.med-prod-sel').value;
+    const qty    = parseInt(row.querySelector('.med-qty').value) || 0;
+    const price  = parseFloat(row.querySelector('.med-price').value) || 0;
+    const prod   = inventory.find(x => x.id === prodId);
+    return { rid, prodId, qty, price, prodName: prod?.name||'', stock: prod?.stock||0 };
+  });
+}
+
+function updateVisitBill() {
+  const fee = parseFloat(document.getElementById('visit-fee').value) || 0;
+  const meds = collectMedRows();
+  let medTotal = 0;
+  meds.forEach(m => {
+    const sub = m.price * m.qty; medTotal += sub;
+    const el = document.getElementById('mst-' + m.rid);
+    if (el) el.textContent = (m.prodName && m.qty > 0 && m.price > 0) ? `Subtotal: ${fmt(sub)}` : '';
+  });
+  const total = fee + medTotal;
+  const box = document.getElementById('visit-bill-box');
+  if (fee <= 0 && medTotal <= 0) { box.style.display='none'; return; }
+  box.style.display = 'block';
+  document.getElementById('vb-fee').textContent = fmt(fee);
+  document.getElementById('vb-meds').innerHTML = meds.filter(m=>m.prodName&&m.qty>0&&m.price>0).map(m =>
+    `<div class="bill-row"><span class="l">${esc(m.prodName)} ×${m.qty}</span><span class="v">${fmt(m.price*m.qty)}</span></div>`
+  ).join('');
+  document.getElementById('vb-total').textContent = fmt(total);
+}
+
+function clearVisitForm() {
+  document.getElementById('visit-owner').value = '';
+  document.getElementById('visit-pet').value   = '';
+  document.getElementById('visit-fee').value   = '';
+  document.getElementById('med-rows-container').innerHTML = '';
+  document.getElementById('no-med-note').style.display = 'block';
+  document.getElementById('visit-bill-box').style.display = 'none';
+  setErrMsg('visit-err', '');
+  medRowCtr = 0;
+  initVisitDate();
+}
+
+async function saveVisit() {
+  const date  = document.getElementById('visit-date').value || todayISO();
+  const owner = document.getElementById('visit-owner').value.trim();
+  const pet   = document.getElementById('visit-pet').value.trim();
+  const fee   = parseFloat(document.getElementById('visit-fee').value) || 0;
+  const meds  = collectMedRows();
+
+  setErrMsg('visit-err', '');
+  if (!owner) return setErrMsg('visit-err', '⚠ Please enter owner name.');
+  if (!pet)   return setErrMsg('visit-err', '⚠ Please enter pet name.');
+  if (fee < 0)return setErrMsg('visit-err', '⚠ Fee cannot be negative.');
+
+  for (const m of meds) {
+    if (!m.prodId)                   return setErrMsg('visit-err', '⚠ Select a product for each medicine row.');
+    if (m.qty <= 0)                  return setErrMsg('visit-err', '⚠ Medicine quantity must be ≥ 1.');
+    if (m.price < 0 || isNaN(m.price)) return setErrMsg('visit-err', '⚠ Enter a valid price.');
+    if (m.qty > m.stock)             return setErrMsg('visit-err', `❌ "${m.prodName}" only has ${m.stock} in stock.`);
+  }
+
+  const medsRec  = meds.map(m => ({ prodId: m.prodId, prodName: m.prodName, qty: m.qty, price: m.price, subtotal: m.price * m.qty }));
+  const medTotal = medsRec.reduce((a, m) => a + m.subtotal, 0);
+  const totalBill= fee + medTotal;
+
+  try {
+    if (visitEditing) {
+      const old = visits.find(x => x.id === visitEditing);
+      if (old) {
+        // Build net delta map: restore old, deduct new
+        const deltaMap = {};
+        for (const om of old.meds) deltaMap[om.prodId] = (deltaMap[om.prodId] || 0) + om.qty;
+        for (const nm of medsRec)  deltaMap[nm.prodId] = (deltaMap[nm.prodId] || 0) - nm.qty;
+
+        for (const [pid, delta] of Object.entries(deltaMap)) {
+          const inv = inventory.find(x => x.id === pid);
+          if ((inv ? inv.stock : 0) + delta < 0)
+            return setErrMsg('visit-err', '❌ Not enough stock for one of the medicines after adjustment.');
         }
 
-        let activeTab = 'inventory';
-
-        function switchTab(t) {
-            activeTab = t;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.className = "px-4 py-2 text-gray-600 rounded-lg font-medium tab-btn hover:bg-gray-200");
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            
-            document.getElementById('tab-' + t).className = "px-4 py-2 bg-emerald-800 text-white rounded-lg font-medium tab-btn";
-            document.getElementById('form-' + t).classList.remove('hidden');
-            renderData();
+        const batch2 = db.batch();
+        for (const [pid, delta] of Object.entries(deltaMap)) {
+          const inv = inventory.find(x => x.id === pid);
+          batch2.update(invCol.doc(pid), { stock: (inv ? inv.stock : 0) + delta });
         }
+        batch2.update(visitsCol.doc(visitEditing), { date, owner, pet, fee, meds: medsRec, medTotal, totalBill });
+        await batch2.commit();
+      }
+      toast('✏️ Visit updated!', 'warn');
+      cancelVisitEdit();
+    } else {
+      const batch = db.batch();
+      for (const m of medsRec) {
+        const inv = inventory.find(x => x.id === m.prodId);
+        if (inv) batch.update(invCol.doc(m.prodId), { stock: inv.stock - m.qty });
+      }
+      batch.set(visitsCol.doc(), { date, owner, pet, fee, meds: medsRec, medTotal, totalBill });
+      await batch.commit();
+      toast(`🐾 Visit saved! Bill: ${fmt(totalBill)}`, 'ok');
+      clearVisitForm();
+    }
+  } catch (err) {
+    console.error('saveVisit:', err);
+    setErrMsg('visit-err', '❌ Firestore error: ' + err.message);
+  }
+}
 
-        function handleInventorySubmit(e) {
-            e.preventDefault();
-            db.ref('inventory').push({
-                name: document.getElementById('inv-name').value,
-                buyPrice: document.getElementById('inv-buy').value,
-                qty: document.getElementById('inv-qty').value
-            });
-            document.getElementById('invForm').reset();
-        }
+function editVisitItem(id) {
+  const v = visits.find(x => x.id === id);
+  if (!v) return;
+  visitEditing = id;
+  document.getElementById('visit-date').value  = v.date || todayISO();
+  document.getElementById('visit-owner').value = v.owner;
+  document.getElementById('visit-pet').value   = v.pet;
+  document.getElementById('visit-fee').value   = v.fee;
+  document.getElementById('med-rows-container').innerHTML = '';
+  medRowCtr = 0;
+  document.getElementById('no-med-note').style.display = v.meds.length ? 'none' : 'block';
+  v.meds.forEach(m => addMedRow({ prodId: m.prodId, qty: m.qty, price: m.price }));
+  updateVisitBill();
+  document.getElementById('visit-form-title').textContent = 'Edit Visit Record';
+  document.getElementById('visit-edit-banner').classList.add('show');
+  document.getElementById('visit-cancel-btn').style.display = 'inline-flex';
+  document.querySelectorAll('#visit-tbody tr').forEach(r => r.classList.remove('editing-row'));
+  const row = document.querySelector(`#visit-tbody tr[data-id="${id}"]`);
+  if (row) row.classList.add('editing-row');
+  document.getElementById('visit-owner').focus();
+  document.getElementById('visit-owner').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
 
-        function handleSaleSubmit(e) {
-            e.preventDefault();
-            db.ref('sales').push({
-                customer: document.getElementById('sale-customer').value,
-                total: document.getElementById('sale-total').value,
-                method: document.getElementById('sale-method').value
-            });
-            document.getElementById('saleForm').reset();
-        }
+function cancelVisitEdit() {
+  visitEditing = null;
+  document.getElementById('visit-form-title').textContent = 'Register Visit';
+  document.getElementById('visit-edit-banner').classList.remove('show');
+  document.getElementById('visit-cancel-btn').style.display = 'none';
+  document.querySelectorAll('#visit-tbody tr').forEach(r => r.classList.remove('editing-row'));
+  clearVisitForm();
+}
 
-        function handlePatientSubmit(e) {
-            e.preventDefault();
-            db.ref('patients').push({
-                name: document.getElementById('p-name').value,
-                type: document.getElementById('p-type').value,
-                symptoms: document.getElementById('p-symptoms').value
-            });
-            document.getElementById('patientForm').reset();
-        }
+async function deleteVisit(id) {
+  if (!confirm('Delete this visit? Medicine stock will be restored.')) return;
+  const v = visits.find(x => x.id === id);
+  try {
+    const batch = db.batch();
+    if (v && v.meds && v.meds.length) {
+      for (const m of v.meds) {
+        const inv = inventory.find(x => x.id === m.prodId);
+        if (inv) batch.update(invCol.doc(m.prodId), { stock: inv.stock + m.qty });
+      }
+    }
+    batch.delete(visitsCol.doc(id));
+    await batch.commit();
+    if (visitEditing === id) cancelVisitEdit();
+    toast('🗑️ Visit deleted. Stock restored.', 'warn');
+  } catch (err) {
+    console.error('deleteVisit:', err);
+    toast('❌ Delete failed: ' + err.message, 'err');
+  }
+}
 
-        function deleteRecord(id) {
-            if(confirm("Delete item?")) db.ref(activeTab + '/' + id).remove();
-        }
+function renderVisits() {
+  const from = document.getElementById('visit-filter-from').value;
+  const to   = document.getElementById('visit-filter-to').value;
+  let list = [...visits];
+  if (from) list = list.filter(v => v.date >= from);
+  if (to)   list = list.filter(v => v.date <= to);
+  list.sort((a,b) => (b.date||'').localeCompare(a.date||''));
 
-        function renderData() {
-            const title = document.getElementById('table-title');
-            const headers = document.getElementById('table-headers');
-            const tbody = document.getElementById('data-rows');
-            
-            db.ref(activeTab).on('value', snap => {
-                tbody.innerHTML = '';
-                const records = snap.val();
-                if(!records) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-400">No data stored inside this tab.</td></tr>';
-                    return;
-                }
-                
-                if(activeTab === 'inventory') {
-                    title.innerText = "Live Inventory Items";
-                    headers.innerHTML = '<tr><th class="p-3">Item Name</th><th class="p-3">Buy Price</th><th class="p-3">Qty</th><th class="p-3">Action</th></tr>';
-                    Object.keys(records).forEach(k => {
-                        tbody.innerHTML += `<tr class="border-b"><td class="p-3 font-medium">${records[k].name}</td><td class="p-3">Tk ${records[k].buyPrice}</td><td class="p-3">${records[k].qty} Pcs</td><td class="p-3"><button class="text-red-500" onclick="deleteRecord('${k}')"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                    });
-                } else if(activeTab === 'sales') {
-                    title.innerText = "Live Store Invoices";
-                    headers.innerHTML = '<tr><th class="p-3">Customer</th><th class="p-3">Bill Paid</th><th class="p-3">Method</th><th class="p-3">Action</th></tr>';
-                    Object.keys(records).forEach(k => {
-                        tbody.innerHTML += `<tr class="border-b"><td class="p-3 font-medium">${records[k].customer}</td><td class="p-3 text-emerald-700 font-bold">Tk ${records[k].total}</td><td class="p-3">${records[k].method}</td><td class="p-3"><button class="text-red-500" onclick="deleteRecord('${k}')"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                    });
-                } else if(activeTab === 'patients') {
-                    title.innerText = "Live Active Patient Registry";
-                    headers.innerHTML = '<tr><th class="p-3">Pet Name</th><th class="p-3">Type</th><th class="p-3">Symptoms</th><th class="p-3">Action</th></tr>';
-                    Object.keys(records).forEach(k => {
-                        tbody.innerHTML += `<tr class="border-b"><td class="p-3 font-medium">${records[k].name}</td><td class="p-3">${records[k].type}</td><td class="p-3 text-xs">${records[k].symptoms}</td><td class="p-3"><button class="text-red-500" onclick="deleteRecord('${k}')"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-                    });
-                }
-            });
-        }
-        renderData();
-    </script>
+  const tb = document.getElementById('visit-tbody');
+  const em = document.getElementById('visit-empty');
+  const ft = document.getElementById('visit-tfoot');
+  document.getElementById('visit-count').textContent = visits.length + ' visits';
+
+  if (!list.length) { tb.innerHTML=''; ft.innerHTML=''; em.style.display='block'; return; }
+  em.style.display='none';
+
+  let i=0;
+  tb.innerHTML = list.map(v => `<tr data-id="${v.id}">
+    <td style="color:var(--ink3)">${++i}</td>
+    <td style="font-size:11.5px;color:var(--ink3)">${fmtDate(v.date)}</td>
+    <td>
+      <div style="font-weight:700;font-size:13px">${esc(v.pet)}</div>
+      <div style="font-size:11px;color:var(--ink3)">${esc(v.owner)}</div>
+    </td>
+    <td style="font-weight:600;color:var(--forest)">${fmt(v.fee)}</td>
+    <td style="font-size:11.5px">${v.meds && v.meds.length ? v.meds.map(m=>`${esc(m.prodName)} ×${m.qty}`).join('<br>') : '<span style="color:var(--ink4)">—</span>'}</td>
+    <td style="color:var(--gold)">${v.meds && v.meds.length ? fmt(v.medTotal) : '—'}</td>
+    <td style="font-weight:800;color:var(--rust);font-size:13.5px">${fmt(v.totalBill)}</td>
+    <td class="no-print">
+      <div style="display:flex;gap:4px">
+        <button class="btn btn-gold btn-sm" onclick="editVisitItem('${v.id}')">Edit</button>
+        <button class="btn btn-rust btn-sm" onclick="deleteVisit('${v.id}')">Del</button>
+      </div>
+    </td>
+  </tr>`).join('');
+
+  const tFee  = list.reduce((a,v) => a+v.fee, 0);
+  const tMed  = list.reduce((a,v) => a+v.medTotal, 0);
+  const tBill = list.reduce((a,v) => a+v.totalBill, 0);
+  ft.innerHTML = `<tr><td colspan="3" style="text-align:right;color:var(--ink2)">Totals</td><td style="color:var(--forest)">${fmt(tFee)}</td><td></td><td style="color:var(--gold)">${fmt(tMed)}</td><td style="color:var(--rust)">${fmt(tBill)}</td><td></td></tr>`;
+}
+
+// ══════════════════════════════════════════════════
+//  INDIVIDUAL CSV EXPORTS
+// ══════════════════════════════════════════════════
+function dlCSV(fn, rows) {
+  const csv = rows.map(r => r.map(c => `"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'}));
+  a.download = fn; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  toast('📥 CSV downloaded!', 'info');
+}
+
+function exportInvCSV() {
+  const rows = [['#','Date','Item Name','Category','Buy Price','Stock Qty','Total Value','Status']];
+  inventory.forEach((p,i) => rows.push([i+1, p.date, p.name, p.category, p.buyPrice.toFixed(2), p.stock, (p.stock*p.buyPrice).toFixed(2), p.stock<=5?'Low Stock':'OK']));
+  rows.push(['','','','','','TOTAL', inventory.reduce((a,p)=>a+p.stock*p.buyPrice,0).toFixed(2), '']);
+  dlCSV(`bilai-inventory-${todayISO()}.csv`, rows);
+}
+
+function exportSalesCSV() {
+  const rows = [['#','Date','Product','Qty','Sell Price','Revenue','Profit']];
+  [...sales].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).forEach((s,i) =>
+    rows.push([i+1, s.date, s.productName, s.qty, s.sellPrice.toFixed(2), s.revenue.toFixed(2), s.profit.toFixed(2)]));
+  rows.push(['','','','','TOTAL', sales.reduce((a,s)=>a+s.revenue,0).toFixed(2), sales.reduce((a,s)=>a+s.profit,0).toFixed(2)]);
+  dlCSV(`bilai-sales-${todayISO()}.csv`, rows);
+}
+
+function exportVisitsCSV() {
+  const rows = [['#','Date','Pet','Owner','Visit Fee','Medicines','Med Total','Total Bill']];
+  [...visits].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).forEach((v,i) => {
+    const ms = v.meds.map(m=>`${m.prodName} x${m.qty}@${m.price.toFixed(2)}`).join(' | ');
+    rows.push([i+1, v.date, v.pet, v.owner, v.fee.toFixed(2), ms||'—', v.medTotal.toFixed(2), v.totalBill.toFixed(2)]);
+  });
+  rows.push(['','','','TOTAL', visits.reduce((a,v)=>a+v.fee,0).toFixed(2), '', visits.reduce((a,v)=>a+v.medTotal,0).toFixed(2), visits.reduce((a,v)=>a+v.totalBill,0).toFixed(2)]);
+  dlCSV(`bilai-visits-${todayISO()}.csv`, rows);
+}
+
+// ══════════════════════════════════════════════════
+//  MASTER CSV — All in One
+// ══════════════════════════════════════════════════
+function masterCSV() {
+  const lines = [];
+  const row   = arr => arr.map(c => `"${String(c??'').replace(/"/g,'""')}"`).join(',');
+  const add   = r   => lines.push(row(r));
+  const sep   = ()  => lines.push('');
+  const title = t   => lines.push(`"===== ${t} ====="`);
+
+  add(['MR. BILAI PET CLINIC — MASTER REPORT']);
+  add([`Generated: ${nowStr()}`]);
+  sep();
+
+  title('SUMMARY');
+  add(['Total Inventory Items',   inventory.length]);
+  add(['Total Stock Units',       inventory.reduce((a,p)=>a+p.stock,0)]);
+  add(['Total Stock Value',       inventory.reduce((a,p)=>a+p.stock*p.buyPrice,0).toFixed(2)]);
+  add(['Total Sale Transactions', sales.length]);
+  add(['Total Retail Profit',     sales.reduce((a,s)=>a+s.profit,0).toFixed(2)]);
+  add(['Total Patient Visits',    visits.length]);
+  add(['Total Visit Earnings',    visits.reduce((a,v)=>a+v.totalBill,0).toFixed(2)]);
+  sep();
+
+  title('INVENTORY / STOCK LEDGER');
+  add(['#','Date','Item Name','Category','Buy Price','Stock Qty','Total Value','Status']);
+  inventory.forEach((p,i) => add([i+1, p.date, p.name, p.category, p.buyPrice.toFixed(2), p.stock, (p.stock*p.buyPrice).toFixed(2), p.stock<=5?'Low Stock':'OK']));
+  add(['','','','','','TOTAL VALUE', inventory.reduce((a,p)=>a+p.stock*p.buyPrice,0).toFixed(2), '']);
+  sep();
+
+  title('COUNTER SALES LOG');
+  add(['#','Date','Product Name','Qty Sold','Sell Price','Revenue','Buy Price','Profit']);
+  [...sales].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).forEach((s,i) =>
+    add([i+1, s.date, s.productName, s.qty, s.sellPrice.toFixed(2), s.revenue.toFixed(2), s.buyPrice.toFixed(2), s.profit.toFixed(2)]));
+  add(['','','','','TOTAL', sales.reduce((a,s)=>a+s.revenue,0).toFixed(2), '', sales.reduce((a,s)=>a+s.profit,0).toFixed(2)]);
+  sep();
+
+  title('PATIENT VISIT RECORDS');
+  add(['#','Date','Pet Name','Owner','Visit Fee','Medicines (Name×Qty@Price)','Med Total','Total Bill']);
+  [...visits].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).forEach((v,i) => {
+    const ms = v.meds.map(m=>`${m.prodName}×${m.qty}@${m.price.toFixed(2)}=${m.subtotal.toFixed(2)}`).join(' | ');
+    add([i+1, v.date, v.pet, v.owner, v.fee.toFixed(2), ms||'—', v.medTotal.toFixed(2), v.totalBill.toFixed(2)]);
+  });
+  add(['','','TOTAL FEES', visits.reduce((a,v)=>a+v.fee,0).toFixed(2), '','', visits.reduce((a,v)=>a+v.medTotal,0).toFixed(2), visits.reduce((a,v)=>a+v.totalBill,0).toFixed(2)]);
+  sep();
+  add(['Designed by Tahmid — Mr. Bilai Pet Clinic']);
+
+  const csvStr = lines.join('\n');
+  const blob = new Blob(['\ufeff'+csvStr], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `MrBilai-MasterReport-${todayISO()}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  toast('📥 Master CSV downloaded!', 'info');
+}
+
+// ══════════════════════════════════════════════════
+//  MASTER PDF — Print All Modules
+// ══════════════════════════════════════════════════
+function masterPDF() {
+  renderInv(); renderSales(); renderVisits();
+  document.getElementById('printDate').textContent = nowStr();
+  document.body.classList.add('master-print');
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => document.body.classList.remove('master-print'), 600);
+  }, 200);
+  toast('🖨️ Opening print dialog…', 'info');
+}
+
+// ══════════════════════════════════════════════════
+//  BOOTSTRAP — Init Firebase after DOM is ready
+// ══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function () {
+  // Initialise Firebase app & Firestore
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+
+  // Enable offline persistence (optional but improves resilience)
+  db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+    if (err.code === 'failed-precondition') {
+      console.warn('Persistence unavailable: multiple tabs open.');
+    } else if (err.code === 'unimplemented') {
+      console.warn('Persistence not supported in this browser.');
+    }
+  });
+
+  // Collection references
+  invCol    = db.collection('inventory');
+  salesCol  = db.collection('sales');
+  visitsCol = db.collection('visits');
+
+  // Seed form dates
+  initInvDate();
+  initSaleDate();
+  initVisitDate();
+  document.getElementById('printDate').textContent = nowStr();
+
+  // ── REAL-TIME LISTENERS ──
+  // Inventory
+  invCol.orderBy('date', 'desc').onSnapshot(snap => {
+    inventory = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderInv();
+    renderSales();
+    renderVisits();
+    updateGlobalStats();
+    populateSaleDropdown();
+    populateVisitMedDropdowns();
+    _checkAllReady();
+  }, err => {
+    console.error('Inventory snapshot error:', err);
+    toast('⚠ Cannot load inventory. Check Firestore rules & indexes.', 'err');
+    _checkAllReady(); // still hide overlay
+  });
+
+  // Sales
+  salesCol.orderBy('date', 'desc').onSnapshot(snap => {
+    sales = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderSales();
+    updateGlobalStats();
+    _checkAllReady();
+  }, err => {
+    console.error('Sales snapshot error:', err);
+    toast('⚠ Cannot load sales. Check Firestore rules & indexes.', 'err');
+    _checkAllReady();
+  });
+
+  // Visits
+  visitsCol.orderBy('date', 'desc').onSnapshot(snap => {
+    visits = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderVisits();
+    updateGlobalStats();
+    _checkAllReady();
+  }, err => {
+    console.error('Visits snapshot error:', err);
+    toast('⚠ Cannot load visits. Check Firestore rules & indexes.', 'err');
+    _checkAllReady();
+  });
+});
+</script>
 </body>
 </html>
+HTMLEOF
+echo "Done. Lines: $(wc -l < /mnt/user-data/outputs/mr-bilai-clinic-v9.html)"
